@@ -66,7 +66,7 @@ const simDistance = (prefs, person1, person2) => {
     const sharedItems = getSharedItems(prefs, person1, person2);
     
     // if 2 persons share no common, return 0
-    if (sharedItems.length===0) return 0;
+    if (Object.keys(sharedItems).length===0) return 0;
 
     // calculate the root of sum of squre
     let sumOfSqures = Object.keys(sharedItems).reduce((p, key) => {
@@ -76,7 +76,7 @@ const simDistance = (prefs, person1, person2) => {
     return 1/(1+Math.sqrt(sumOfSqures));
 }
 
-// return Perason Correlation of p1 and p2
+// return Pearson Correlation of p1 and p2
 const simPearson = (prefs, person1, person2) => {
     // get shared items list
     const sharedItems = getSharedItems(prefs, person1, person2);
@@ -114,7 +114,7 @@ const simPearson = (prefs, person1, person2) => {
 
 const topMatches = (prefs, person, n=5, similarity=simPearson) => {
     let scores = Object.keys(prefs).filter(key=>key!==person).map(other => {
-        return {person: person, score: similarity(prefs, person, other)};
+        return {person: other, score: similarity(prefs, person, other)};
     });
     scores = scores.sort((a,b)=> b.score - a.score);
     scores = scores.slice(0,n);
@@ -157,7 +157,19 @@ const getRecommendations = (prefs, person, similarity=simPearson) => {
     })
 
     console.table(result)
+    rankings = rankings.sort((a,b) => b.ranking - a.ranking);
     return rankings;
+}
+
+const transposePrefs = (prefs) => {
+    result = {}
+    for (let person of Object.keys(prefs)) {
+        for (let item of Object.keys(prefs[person])) {
+            result[item] = result[item] || {};
+            result[item][person] = prefs[person][item]
+        }
+    }
+    return result;
 }
 
 
@@ -171,4 +183,9 @@ for (let person of Object.keys(critics)) {
 }
 */
 
+console.table(critics);
 console.table(getRecommendations(critics, 'Toby'));
+
+console.table(transposePrefs(critics));
+console.table(topMatches(transposePrefs(critics), 'Superman Returns'))
+console.table(getRecommendations(transposePrefs(critics), 'Just My Luck'));

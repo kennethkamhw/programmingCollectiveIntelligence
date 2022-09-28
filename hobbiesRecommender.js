@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { parse } = require("csv-parse");
-const datasetPath = "./dataset/spotify_dataset.csv";
+const datasetPath = "./dataset/Student_Behaviour.csv";
 
 fs.createReadStream(datasetPath)
     .pipe(parse({

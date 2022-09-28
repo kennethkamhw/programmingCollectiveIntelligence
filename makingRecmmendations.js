@@ -121,11 +121,41 @@ const topMatches = (prefs, person, n=5, similarity=simPearson) => {
     return scores;
 }
 
+// use the score from all other users, and get recommendations
+const getRecommendations = (prefs, person, similarity=simPearson) => {
+    let totals = {};
+    let simSums = {};
+    // exclude person from the comparasion
+    for (let other of Object.keys(prefs).filter(other => other !== person)) {
+        console.log('Other: ' + other);
+        let sim = similarity(prefs, person, other);
+
+        if (sim<=0) continue;
+
+        for (let item of Object.keys(prefs[other]).filter(item => !Object.keys(prefs[person]).includes(item))) {
+            console.log('    item: ' + item);
+            totals[item] = (prefs[other][item] * sim)+totals[item] || (prefs[other][item] * sim);
+            simSums[item] = simSums[item] + sim || sim;
+            console.log('        totals: ' + totals[item]);
+        }
+    }
+    
+    let rankings = Object.keys(totals).map(item => {
+        return {ranking: totals[item]/simSums[item], item: item};
+    })
+
+    return rankings;
+}
+
 
 //console.log(`Pearson: ${simPearson(critics, 'Lisa Rose', 'Gene Seymour')}`);
 
 //console.log(`Distance: ${simDistance(critics, 'Lisa Rose', 'Gene Seymour')}`);
 
+/*
 for (let person of Object.keys(critics)) {
     console.log(`${person}: ${topMatches(critics, person, 3).map(e=>JSON.stringify(e))}`)
 }
+*/
+
+console.log(getRecommendations(critics, 'Toby'));

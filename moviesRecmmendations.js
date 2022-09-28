@@ -172,6 +172,17 @@ const transposePrefs = (prefs) => {
     return result;
 }
 
+const calculateSimilarityItems = (prefs, n=10) => {
+    const itemPrefs = transposePrefs(prefs)
+
+    Object.entries(itemPrefs).forEach((e, i, arr)=>{
+        const item = e[0];
+        const values = e[1];
+        
+        if (i%100===0) console.log(`${i}/${arr.length}`)
+        scores = topMatches(itemPrefs, key, n=n, similarity=simDistance)
+    })
+}
 
 //console.log(`Pearson: ${simPearson(critics, 'Lisa Rose', 'Gene Seymour')}`);
 
@@ -183,9 +194,13 @@ for (let person of Object.keys(critics)) {
 }
 */
 
+/*
 console.table(critics);
 console.table(getRecommendations(critics, 'Toby'));
 
 console.table(transposePrefs(critics));
 console.table(topMatches(transposePrefs(critics), 'Superman Returns'))
 console.table(getRecommendations(transposePrefs(critics), 'Just My Luck'));
+*/
+
+calculateSimilarityItems(critics);

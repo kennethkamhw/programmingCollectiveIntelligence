@@ -114,7 +114,7 @@ const simPearson = (prefs, person1, person2) => {
 
 const topMatches = (prefs, person, n=5, similarity=simPearson) => {
     let scores = Object.keys(prefs).filter(key=>key!==person).map(other => {
-        return {person: other, score: similarity(prefs, person, other)};
+        return {item: other, score: similarity(prefs, person, other)};
     });
     scores = scores.sort((a,b)=> b.score - a.score);
     scores = scores.slice(0,n);
@@ -175,12 +175,33 @@ const transposePrefs = (prefs) => {
 const calculateSimilarityItems = (prefs, n=10) => {
     const itemPrefs = transposePrefs(prefs)
 
+    let scores = {};
+
     Object.entries(itemPrefs).forEach((e, i, arr)=>{
         const item = e[0];
         const values = e[1];
         
         if (i%100===0) console.log(`${i}/${arr.length}`)
-        scores = topMatches(itemPrefs, key, n=n, similarity=simDistance)
+        scores[item] = topMatches(itemPrefs, item, n=n, similarity=simDistance)
+    })
+
+    return scores
+}
+
+const getRecommendedItems = (prefs, itemMatch, user) => {
+    userRating = Object.entries(prefs[user]);
+    scores = {};
+    totalSim = {};
+
+    userRating.forEach(([item, rating]) => {
+        itemMatch[item].forEach(({item, score}) => {
+            if (userRating.map(e=>e[0]).includes(item)) return;
+            scores[item] = +scores[item] + score * rating || 0;
+            totalSim[item] = +totalSim[item] + score || 0;
+        })
+        console.log(item)
+        console.log(scores)
+        console.log(totalSim)
     })
 }
 
@@ -203,4 +224,6 @@ console.table(topMatches(transposePrefs(critics), 'Superman Returns'))
 console.table(getRecommendations(transposePrefs(critics), 'Just My Luck'));
 */
 
-calculateSimilarityItems(critics);
+//console.log(calculateSimilarityItems(critics));
+
+console.log(getRecommendedItems(critics, calculateSimilarityItems(critics), 'Toby'))

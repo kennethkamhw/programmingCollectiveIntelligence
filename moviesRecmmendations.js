@@ -64,16 +64,16 @@ const getSharedItems = (prefs, person1, person2) => {
 // Return a distance similarity between person1 and person2
 const simDistance = (prefs, person1, person2) => {
     const sharedItems = getSharedItems(prefs, person1, person2);
-    
+
     // if 2 persons share no common, return 0
-    if (Object.keys(sharedItems).length===0) return 0;
+    if (Object.keys(sharedItems).length === 0) return 0;
 
     // calculate the root of sum of squre
     let sumOfSqures = Object.keys(sharedItems).reduce((p, key) => {
-        return p + Math.pow(prefs[person1][key] - prefs[person2][key],2);
+        return p + Math.pow(prefs[person1][key] - prefs[person2][key], 2);
     }, 0)
 
-    return 1/(1+Math.sqrt(sumOfSqures));
+    return 1 / (1 + Math.sqrt(sumOfSqures));
 }
 
 // return Pearson Correlation of p1 and p2
@@ -83,46 +83,46 @@ const simPearson = (prefs, person1, person2) => {
 
     // measure the length of returned list, if the length is 0, not common item and return 1
     const numOfSharedItems = Object.keys(sharedItems).length;
-    if (numOfSharedItems===0) return 1;
+    if (numOfSharedItems === 0) return 1;
 
     // Calculate Pearson Correlation
     const sum1 = Object.keys(sharedItems).reduce((p, key) => {
         return p + prefs[person1][key];
-    },0);
+    }, 0);
     const sum2 = Object.keys(sharedItems).reduce((p, key) => {
         return p + prefs[person2][key];
-    },0);
+    }, 0);
 
     const sum1sq = Object.keys(sharedItems).reduce((p, key) => {
         return p + Math.pow(prefs[person1][key], 2);
-    },0);
+    }, 0);
     const sum2sq = Object.keys(sharedItems).reduce((p, key) => {
         return p + Math.pow(prefs[person2][key], 2);
-    },0);
+    }, 0);
 
     const pSum = Object.keys(sharedItems).reduce((p, key) => {
         return p + (prefs[person1][key] * prefs[person2][key]);
-    },0);
+    }, 0);
 
     const num = pSum - (sum1 * sum2 / numOfSharedItems);
-    const den = Math.sqrt((sum1sq - Math.pow(sum1, 2)/numOfSharedItems)* (sum2sq - Math.pow(sum2, 2)/numOfSharedItems));
-    
-    if (den===0) return 0;
+    const den = Math.sqrt((sum1sq - Math.pow(sum1, 2) / numOfSharedItems) * (sum2sq - Math.pow(sum2, 2) / numOfSharedItems));
 
-    return num/den;
+    if (den === 0) return 0;
+
+    return num / den;
 }
 
-const topMatches = (prefs, person, n=5, similarity=simPearson) => {
-    let scores = Object.keys(prefs).filter(key=>key!==person).map(other => {
-        return {item: other, score: similarity(prefs, person, other)};
+const topMatches = (prefs, person, n = 5, similarity = simPearson) => {
+    let scores = Object.keys(prefs).filter(key => key !== person).map(other => {
+        return { item: other, score: similarity(prefs, person, other) };
     });
-    scores = scores.sort((a,b)=> b.score - a.score);
-    scores = scores.slice(0,n);
+    scores = scores.sort((a, b) => b.score - a.score);
+    scores = scores.slice(0, n);
     return scores;
 }
 
 // use the score from all other users, and get recommendations
-const getRecommendations = (prefs, person, similarity=simPearson) => {
+const getRecommendations = (prefs, person, similarity = simPearson) => {
     let totals = {};
     let simSums = {};
     let result = {
@@ -133,31 +133,31 @@ const getRecommendations = (prefs, person, similarity=simPearson) => {
     // exclude person from the comparasion
     for (let other of Object.keys(prefs).filter(other => other !== person)) {
         let sim = similarity(prefs, person, other);
-        
-        if (sim<=0) continue;
+
+        if (sim <= 0) continue;
         result[other] = {
             sim: +sim.toFixed(2)
         };
 
         for (let item of Object.keys(prefs[other]).filter(item => !Object.keys(prefs[person]).includes(item))) {
 
-            totals[item] = (prefs[other][item] * sim)+totals[item] || (prefs[other][item] * sim);
+            totals[item] = (prefs[other][item] * sim) + totals[item] || (prefs[other][item] * sim);
             simSums[item] = simSums[item] + sim || sim;
             result[other][item] = +prefs[other][item].toFixed(2);
-            result[other]['Sx.'+item] = +(prefs[other][item] * sim).toFixed(2);
+            result[other]['Sx.' + item] = +(prefs[other][item] * sim).toFixed(2);
         }
     }
-    
+
     let rankings = Object.keys(totals).map(item => {
 
-        result['_total']['Sx.'+item] = +totals[item].toFixed(2);
-        result['_simSums']['Sx.'+item] = +simSums[item].toFixed(2);
-        result['_ranking']['Sx.'+item] = +(totals[item]/simSums[item]).toFixed(2);
-        return {ranking: totals[item]/simSums[item], item: item};
+        result['_total']['Sx.' + item] = +totals[item].toFixed(2);
+        result['_simSums']['Sx.' + item] = +simSums[item].toFixed(2);
+        result['_ranking']['Sx.' + item] = +(totals[item] / simSums[item]).toFixed(2);
+        return { ranking: totals[item] / simSums[item], item: item };
     })
-
+d
     console.table(result)
-    rankings = rankings.sort((a,b) => b.ranking - a.ranking);
+    rankings = rankings.sort((a, b) => b.ranking - a.ranking);
     return rankings;
 }
 
@@ -172,17 +172,17 @@ const transposePrefs = (prefs) => {
     return result;
 }
 
-const calculateSimilarityItems = (prefs, n=10) => {
+const calculateSimilarityItems = (prefs, n = 10) => {
     const itemPrefs = transposePrefs(prefs)
 
     let scores = {};
 
-    Object.entries(itemPrefs).forEach((e, i, arr)=>{
+    Object.entries(itemPrefs).forEach((e, i, arr) => {
         const item = e[0];
         const values = e[1];
-        
-        if (i%100===0) console.log(`${i}/${arr.length}`)
-        scores[item] = topMatches(itemPrefs, item, n=n, similarity=simDistance)
+
+        if (i % 100 === 0) console.log(`${i}/${arr.length}`)
+        scores[item] = topMatches(itemPrefs, item, n = n, similarity = simDistance)
     })
 
     return scores
@@ -194,8 +194,8 @@ const getRecommendedItems = (prefs, itemMatch, user) => {
     totalSim = {};
 
     userRating.forEach(([item, rating]) => {
-        itemMatch[item].forEach(({item, score}) => {
-            if (userRating.map(e=>e[0]).includes(item)) return;
+        itemMatch[item].forEach(({ item, score }) => {
+            if (userRating.map(e => e[0]).includes(item)) return;
             scores[item] = +scores[item] + score * rating || 0;
             totalSim[item] = +totalSim[item] + score || 0;
         })

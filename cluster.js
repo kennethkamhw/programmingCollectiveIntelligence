@@ -1,6 +1,6 @@
 
 class Bicluster {
-    constructor(vec, left=null, right=null, distance=0.0, id=null) {
+    constructor(vec, {left=null, right=null, distance=0.0, id=null}) {
       this.left = left;
       this.right = right;
       this.vec = vec;

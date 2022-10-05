@@ -1,3 +1,4 @@
+const { Bicluster } = require('./cluster.js');
 const parser = require("csv-parse/sync").parse;
 const fs = require("fs");
 const path = "./dataset/WinnersInterviewBlogPosts.csv";
@@ -99,7 +100,7 @@ data = parser(data, {
 const apCount = getOverallFrequencies(data);
 
 // Limited the frequency range
-const wordList = createWordList(apCount, 0.1, 0.5);
+const wordList = createWordList(apCount, lower=0.03, upper=0.1);
 
 // apply frequency filter
 const filteredData = data.map((e) => {
@@ -113,8 +114,3 @@ const filteredData = data.map((e) => {
     wordCount: filterWordCount,
   };
 });
-
-// search similar blog with filterData[0]
-console.log(filteredData.map(e=> {
-    return pearson(Object.values(filteredData[0].wordCount), Object.values(e.wordCount))
-}))

@@ -5,15 +5,15 @@ const app = express();
 app.use("/static", express.static("public"));
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/view/index.html");
+  res.sendFile(__dirname + "/views/index.html");
 });
 
 app.get("/blogClustering", (req, res) => {
-  res.sendFile(__dirname + "/view/blogClustering.html");
+  res.sendFile(__dirname + "/views/blogClustering.html");
 });
 
 app.get("/wordClustering", (req, res) => {
-  res.sendFile(__dirname + "/view/wordClustering.html");
+  res.sendFile(__dirname + "/views/wordClustering.html");
 });
 
 app.get("/data1", (req, res) => {

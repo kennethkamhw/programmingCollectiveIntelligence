@@ -33,13 +33,29 @@ const kcluster = (data, distance = pearson, k = 4) => {
         };
       });
     });
-  console.log(clusters);
 
-  let lastMatches = null;
+    // clusters is a list of 4 Objects contain 'word' and 'center' properties
+  for (let t=0; t<10; t++) {
+    if (t%5===0) console.log(`Iteration ${t}`);
 
-  for (let t=0; t<0; t++) {
-      if (t%3==0) console.log(`Iteration ${t}`);
-      let bestMatches = Array(k).fill([]);
+    /*
+    data = [
+      title: STRING,
+      wordCount: {
+        word: INT...
+      }
+    ]
+    */
+    // iterate the data rows, check which cluster is the closest
+    let clusterAssginment = data.map(e=>{
+      return clusters.map(cluster=>{
+        return distance(cluster.map(e=>e.center), Object.values(e.wordCount))
+      }).reduce((p,v,i,arr)=> {
+        return v<arr[p]? i:p
+      },0)
+    })
+
+    console.log(clusterAssginment)
 
 
   }

@@ -143,20 +143,44 @@ const hcluster = (data, distance = pearson) => {
   return cluster[0];
 };
 
-const printCluster = (cluster, n=0) => {
+const printCluster = (cluster, n = 0) => {
   // base case, either node or branch
   let indent = " ".repeat(n);
-  if (cluster.id<0) {
-    console.log(indent + "-")
+  if (cluster.id < 0) {
+    console.log(indent + "-");
   } else {
     console.log(indent + filteredData[cluster.id].title);
   }
 
   // recursing if there is left or right branch
-  if (cluster.left!==null) printCluster(cluster.left, n=n+1);
-  if (cluster.right!==null) printCluster(cluster.right, n=n+1);
-  
-}
+  if (cluster.left !== null) printCluster(cluster.left, (n = n + 1));
+  if (cluster.right !== null) printCluster(cluster.right, (n = n + 1));
+};
+const printClusterRotated = (cluster, n = 0) => {
+  // base case, either node or branch
+  let indent = " ".repeat(n);
+  if (cluster.id < 0) {
+    console.log(indent + "-");
+  } else {
+    console.log(indent + newData[cluster.id].word);
+  }
+
+  // recursing if there is left or right branch
+  if (cluster.left !== null) printClusterRotated(cluster.left, (n = n + 1));
+  if (cluster.right !== null) printClusterRotated(cluster.right, (n = n + 1));
+};
+
+const rotateMatrix = (data) => {
+  let newData = [];
+  Object.keys(data[0].wordCount).forEach((word) => {
+    let newRow = {};
+    data.forEach((e) => {
+      Object.assign(newRow, { [e.title]: e.wordCount[word] });
+    });
+    newData.push({ word: word, wordCount: newRow });
+  });
+  return newData;
+};
 
 //===========main procedure===========
 let data = fs.readFileSync(path, { encoding: "utf8", flag: "r" });
@@ -196,4 +220,8 @@ const filteredData = data.map((e) => {
   };
 });
 
-printCluster(hcluster(filteredData));
+let newData = rotateMatrix(filteredData);
+let result = hcluster(filteredData);
+let resultRotated = hcluster(newData);
+printCluster(result);
+printClusterRotated(resultRotated);

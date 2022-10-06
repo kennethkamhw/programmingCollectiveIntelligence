@@ -114,7 +114,7 @@ const hcluster = (data, distance = pearson) => {
         }
       }
     }
-    console.log(`closest=${closest}, lowestPair=${lowestPair}`);
+    //console.log(`closest=${closest}, lowestPair=${lowestPair}`);
 
     let mergevec = averageVector(
       cluster[lowestPair[0]].vec,
@@ -132,12 +132,13 @@ const hcluster = (data, distance = pearson) => {
     cluster.splice(lowestPair[1], 1);
     cluster.splice(lowestPair[0], 1);
     cluster.push(newCluster);
-
+    /*
     console.log(
       `distances length: ${Object.entries(distances).length}, cluster length: ${
         cluster.length
       }`
     );
+    */
   }
 
   return cluster[0];
@@ -182,29 +183,33 @@ const rotateMatrix = (data) => {
   return newData;
 };
 
-const iterateNestedObj = (obj) => {
-  Object.keys(obj).filter(e=>(e==='left'|e==='right')).forEach(key => {
+const iterateNestedObj = (cluster, parent) => {
+  let children = [];
+  if (cluster.id > 0) {
+    return { id: cluster.id, name: filteredData[cluster.id].title };
+  }
 
-  console.log(`key: ${key}, value: ${obj[key]}`)
+  if (cluster.left !== null)
+    children.push(iterateNestedObj(cluster.left, parent));
+  if (cluster.right !== null)
+    children.push(iterateNestedObj(cluster.right, parent));
 
-  if (typeof obj[key] === 'object' && obj[key] !== null) {
-          iterateNestedObj(obj[key])
-      }
-  })
-}
+  return { id: cluster.id, children: children };
+};
 
-const createTree = (obj) => {
-  const iterate = (obj) => {
-    Object.keys(obj).forEach(key => {
+const iterateNestedObjRotated = (cluster, parent) => {
+  let children = [];
+  if (cluster.id > 0) {
+    return { id: cluster.id, name: filteredDataRotated[cluster.id].word };
+  }
 
-    console.log(`key: ${key}, value: ${obj[key]}`)
+  if (cluster.left !== null)
+    children.push(iterateNestedObjRotated(cluster.left, parent));
+  if (cluster.right !== null)
+    children.push(iterateNestedObjRotated(cluster.right, parent));
 
-    if (typeof obj[key] === 'object' && obj[key] !== null) {
-            iterate(obj[key])
-        }
-    })
-}
-}
+  return { id: cluster.id, children: children };
+};
 
 //===========main procedure===========
 let data = fs.readFileSync(path, { encoding: "utf8", flag: "r" });
@@ -244,10 +249,13 @@ const filteredData = data.map((e) => {
   };
 });
 
-let newData = rotateMatrix(filteredData);
+let filteredDataRotated = rotateMatrix(filteredData);
 let result = hcluster(filteredData);
-let resultRotated = hcluster(newData);
+let resultRotated = hcluster(filteredDataRotated);
 //printCluster(result);
 //printClusterRotated(resultRotated);
-console.log(resultRotated)
-console.log(iterateNestedObj(resultRotated))
+//console.log(resultRotated)
+const output = iterateNestedObj(result);
+const outputRotated = iterateNestedObjRotated(resultRotated);
+
+module.exports = { output, outputRotated };

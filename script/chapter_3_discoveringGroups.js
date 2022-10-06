@@ -1,7 +1,7 @@
 const { Bicluster } = require("./cluster.js");
 const parser = require("csv-parse/sync").parse;
 const fs = require("fs");
-const path = "./dataset/WinnersInterviewBlogPosts.csv";
+const path = "../dataset/WinnersInterviewBlogPosts.csv";
 
 //==========define functions==========
 const getWords = (html = "") => {
@@ -258,4 +258,4 @@ let resultRotated = hcluster(filteredDataRotated);
 const output = iterateNestedObj(result);
 const outputRotated = iterateNestedObjRotated(resultRotated);
 
-module.exports = { output, outputRotated };
+module.exports = { output, outputRotated, pearson, countWord, getWords, getOverallFrequencies, createWordList };

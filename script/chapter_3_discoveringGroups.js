@@ -182,6 +182,30 @@ const rotateMatrix = (data) => {
   return newData;
 };
 
+const iterateNestedObj = (obj) => {
+  Object.keys(obj).filter(e=>(e==='left'|e==='right')).forEach(key => {
+
+  console.log(`key: ${key}, value: ${obj[key]}`)
+
+  if (typeof obj[key] === 'object' && obj[key] !== null) {
+          iterateNestedObj(obj[key])
+      }
+  })
+}
+
+const createTree = (obj) => {
+  const iterate = (obj) => {
+    Object.keys(obj).forEach(key => {
+
+    console.log(`key: ${key}, value: ${obj[key]}`)
+
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+            iterate(obj[key])
+        }
+    })
+}
+}
+
 //===========main procedure===========
 let data = fs.readFileSync(path, { encoding: "utf8", flag: "r" });
 
@@ -223,5 +247,7 @@ const filteredData = data.map((e) => {
 let newData = rotateMatrix(filteredData);
 let result = hcluster(filteredData);
 let resultRotated = hcluster(newData);
-printCluster(result);
-printClusterRotated(resultRotated);
+//printCluster(result);
+//printClusterRotated(resultRotated);
+console.log(resultRotated)
+console.log(iterateNestedObj(resultRotated))

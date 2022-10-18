@@ -1,7 +1,7 @@
 const { Bicluster } = require("./cluster.js");
 const parser = require("csv-parse/sync").parse;
 const fs = require("fs");
-const path = "../dataset/WinnersInterviewBlogPosts.csv";
+const path = "./dataset/WinnersInterviewBlogPosts.csv";
 
 //==========define functions==========
 const getWords = (html = "") => {

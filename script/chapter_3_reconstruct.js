@@ -1,7 +1,7 @@
-const logTree = require('console-log-tree')
+const logTree = require("console-log-tree");
 const parser = require("csv-parse/sync").parse;
 const fs = require("fs");
-const path = "../dataset/WinnersInterviewBlogPosts.csv";
+const path = "./dataset/WinnersInterviewBlogPosts.csv";
 
 //==========define functions==========
 const getWords = (html = "") => {
@@ -162,7 +162,7 @@ const hcluster = (data, distance = pearson) => {
     };
   });
 
-  while (clusters.length>2) {
+  while (clusters.length > 2) {
     let lowestPair = [1, 0];
     let closest = distance(
       clusters[lowestPair[0]].wordCounts,
@@ -172,7 +172,10 @@ const hcluster = (data, distance = pearson) => {
     for (let i = 0; i < clusters.length; i++) {
       for (let j = i + 1; j < clusters.length; j++) {
         if (!distances[`${clusters[i]._id}, ${clusters[j]._id}`]) {
-          distances[`${clusters[i]._id}, ${clusters[j]._id}`] = distance(clusters[i].wordCounts, clusters[j].wordCounts)
+          distances[`${clusters[i]._id}, ${clusters[j]._id}`] = distance(
+            clusters[i].wordCounts,
+            clusters[j].wordCounts
+          );
         }
 
         let d = distance(clusters[i].wordCounts, clusters[j].wordCounts);
@@ -187,7 +190,7 @@ const hcluster = (data, distance = pearson) => {
     let mergedClusterCenter = averageVector(
       clusters[lowestPair[0]].wordCounts,
       clusters[lowestPair[1]].wordCounts
-    )
+    );
 
     let newCluster = {
       wordCounts: mergedClusterCenter,
@@ -197,13 +200,13 @@ const hcluster = (data, distance = pearson) => {
       dist: closest,
     };
     currentClusterId--;
-    console.log(`Lowest Pair: ${lowestPair}`)
+    console.log(`Lowest Pair: ${lowestPair}`);
     clusters.splice(lowestPair[1], 1);
     clusters.splice(lowestPair[0], 1);
     clusters.push(newCluster);
     console.log(`clusters.length: ${clusters.length}`);
   }
-  return clusters
+  return clusters;
 };
 
 //=============Main Procedure===================
@@ -234,11 +237,12 @@ let data = parser(raw_data, {
   });
 
 let combinedWordList = countOverallFrequencies(data);
-let filteredWordList = filterWordList(combinedWordList, 0.025, 0.02);
-let normalizedData = normalizeData(data, filteredWordList);
+let filteredWordList = filterWordList(combinedWordList, 0.012, 0.01);
+let normalizedData = normalizeData(data, filteredWordList.slice(0,100));
 let rotatedData = rotateMatrix(normalizedData);
 let tree = hcluster(rotatedData);
 
-const treeStr = logTree.parse(tree)
- 
-console.log(treeStr)
+const treeStr = logTree.parse(tree);
+
+module.exports.treeStr = treeStr;
+module.exports.tree = tree;

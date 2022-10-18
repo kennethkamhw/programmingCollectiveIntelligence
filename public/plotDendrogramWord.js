@@ -10,15 +10,14 @@ const svg = d3
   .attr("height", height)
   .append("g")
   .attr("transform", "translate(40,0)"); // bit of margin on the left = 40
-
 // read json data https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_dendrogram.json
 d3.json("/data2").then(function (data) {
-  console.log(data);
   // Create the cluster layout:
   const cluster = d3.cluster().size([height, width - 200]); // 100 is the margin I will have on the right side
 
   // Give the data to this cluster layout:
   const root = d3.hierarchy(data, function (d) {
+    console.log(d)
     return d.children;
   });
   cluster(root);
